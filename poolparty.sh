@@ -206,10 +206,10 @@ if find . \( ! -regex '.*/\..*' \) -type f -mindepth 2 -print -quit 2>/dev/null 
 
 clear
 check
-if [ $MOD == 0 ]
-then
-	cmod
-fi
+# if [ $MOD == 0 ]
+# then
+# 	cmod
+# fi
 if [ $NORM == 0 ]
 then
 	norm
