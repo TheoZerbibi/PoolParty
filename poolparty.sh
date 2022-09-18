@@ -117,7 +117,7 @@ function comp {
 	printf "[=============================================================================================================]\n"
 	printf "\n\t${WHITE}${UNDERLINE}--- COMPILATION ---${STOP}\n\n"
 
-	if gcc -c ./*/ft*.c $BASEDIR/ft_main.c -Wall -Wextra -Werror
+	if gcc -c ./*/ft*.c -Wall -Wextra -Werror
 	then
 		printf "\t\t${WHITE}All files check.${STOP}"
 		printf "\n\n${GREEN}\t\t\t\t\t\t\t\t\t\t\t\t- OK √${STOP}\n"
