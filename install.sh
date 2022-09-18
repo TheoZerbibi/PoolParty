@@ -29,7 +29,7 @@ header() {
 	printf "┃ ┃┃╱╱┃╰╯┃╰╯┃╰┫┃╱╱┃╭╮┃┃┃╰┫╰━╯┃ ┃\n";
 	printf "┃ ╰╯╱╱╰━━┻━━┻━┻╯╱╱╰╯╰┻╯╰━┻━╮╭╯ ┃\n";
 	printf "┃ ╱╱╱╱╱╱╱╱╱╱╱╱𝔹𝕪 𝕥𝕙𝕫𝕖𝕣𝕚𝕓𝕚╭━╯┃  ┃\n";
-	printf "┃ ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╰━━╯  ┃\n";
+	printf "┃ ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╰━━╯V4┃\n";
 	printf "┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n"
 }
 
@@ -81,32 +81,43 @@ setup_color() {
 }
 
 setup_poolparty() {
-	header
 	echo "┃> Installation"
 	printf "┃> Cloning PoolParty."
 
-	git init --quiet "$DIR" && cd "$DIR" \
-  && git config core.eol lf \
-  && git config core.autocrlf false \
-  && git config fsck.zeroPaddedFilemode ignore \
-  && git config fetch.fsck.zeroPaddedFilemode ignore \
-  && git config receive.fsck.zeroPaddedFilemode ignore \
-  && git config oh-my-zsh.remote origin \
-  && git config oh-my-zsh.branch "$BRANCH" \
-  && git remote add origin "$REMOTE" \
-  && git fetch --depth=1 origin \
-  && git checkout -b "$BRANCH" "origin/$BRANCH" || {
-	[ ! -d "$ZSH" ] || {
-	  cd -
-	  rm -rf "$ZSH" 2>/dev/null
+	git clone --quiet ${REMOTE} ${DIR} || {
+		[ ! -d "$DIR" ] || {
+			rm -rf "$DIR" 2>/dev/null
+		}
+		fmt_error "Failed to clone PoolParty"
+		exit 1
 	}
-	fmt_error "git clone of oh-my-zsh repo failed"
-	exit 1
-  }
-  # Exit installation directory
-  cd -
+	
+	chmod +x ${DIR}/*.sh
+	printf "\r\033[K┃${FMT_GREEN}> Successfully cloned Poolparty.${FMT_RESET}\n"
+}
 
-  echo
+setup_alias() {
+	printf "┃> Creating alias."
+	if ! command_exists pp; then
+		echo "alias pp=$DIR/poolparty.sh" >> $HOME/.zshrc;
+	fi
+	printf "\r\033[K┃${FMT_GREEN}> Successfully create alias.${FMT_RESET}\n"
+}
+
+print_success() {
+	clear
+	header
+	cat << EOF
+┃$FMT_GREEN> PoolParty a bien été installé !$FMT_RESET
+┃
+┃> Pour l'utiliser tu dois te placer dans
+┃$FMT_BOLD  le fichier racine de ton module.$FMT_RESET
+┃  Il suffit ensuite de faire$FMT_RESET$FMT_BOLD pp$FMT_RESET.
+┃
+┃> PS :Si l'alias \`${FMT_BOLD}pp${FMT_RESET}\` ne fonctionne pas,
+┃  faite la commande : \`${FMT_BOLD}source ~/.zshrc${FMT_RESET}\`
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EOF
 }
 
 main() {
@@ -135,6 +146,12 @@ EOF
 	fi
 
 	setup_poolparty
+	setup_alias
+
+	sleep 1
+
+	print_success
+	exec zsh -l
 }
 
 main "$@"
