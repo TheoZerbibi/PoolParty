@@ -41,13 +41,12 @@ fmt_underline() {
 	is_subshell && printf '\033[4m%s\033[24m\n' "$*" || printf '%s\n' "$*"
 }
 
-# shellcheck disable=SC2016 # backtick in single-quote
 fmt_code() {
-  is_subshell && printf '`\033[2m%s\033[22m`\n' "$*" || printf '`%s`\n' "$*"
+	is_subshell && printf '`\033[2m%s\033[22m`\n' "$*" || printf '`%s`\n' "$*"
 }
 
 fmt_error() {
-  printf '\r\033[K┃%s>Error: %s%s\n' "${FMT_BOLD}${FMT_RED}" "$*" "$FMT_RESET" >&2
+	printf '\r\033[K┃%s>Error: %s%s\n' "${FMT_BOLD}${FMT_RED}" "$*" "$FMT_RESET" >&2
 }
 
 setup_color() {
@@ -112,10 +111,11 @@ print_success() {
 ┃
 ┃> Pour l'utiliser tu dois te placer dans
 ┃$FMT_BOLD  le fichier racine de ton module.$FMT_RESET
-┃  Il suffit ensuite de faire$FMT_RESET$FMT_BOLD pp$FMT_RESET.
+┃  Il suffit ensuite de faire la commande : $(fmt_code "pp")
+┃  Fait $(fmt_code "pp -h") ou $(fmt_code "pp --help") pour plus d'informations.
 ┃
-┃> PS :Si l'alias \`${FMT_BOLD}pp${FMT_RESET}\` ne fonctionne pas,
-┃  faite la commande : \`${FMT_BOLD}source ~/.zshrc${FMT_RESET}\`
+┃> PS : Si l'alias \`${FMT_BOLD}pp${FMT_RESET}\` ne fonctionne pas,
+┃  faite la commande : $(fmt_code "source ~/.zshrc")
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 EOF
 }
@@ -138,7 +138,7 @@ main() {
 	if [ -d "$DIR" ];then
 		cat << EOF
 ┃> PoolParty is already install !
-┃  The script doesn't work ? Try \`source ~/.zshrc\`.
+┃  The script doesn't work ? Try $(fmt_code "source ~/.zshrc")
 ┃  If you want remove or reinstall the script, just delete the PoolParty folder ($DIR).
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 EOF
