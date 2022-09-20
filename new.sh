@@ -10,18 +10,19 @@ REPO=${REPO:-TheoZerbibi/PoolParty}
 REMOTE=${REMOTE:-https://github.com/${REPO}.git}
 REMOTE_V="${REMOTE_V:-$(curl -s "https://raw.githubusercontent.com/${REPO}/master/.version")}"
 
-
 PPDIR="${DIR:-$HOME/.poolparty}"
 
 USER=${USER:-$(id -u -n)}
 BASEDIR="${BASEDIR:-$(dirname "$0")}";
 DIR="${DIR:-$(pwd)}";
 DIRNAME="${DIRNAME:-$(basename "$PWD")}";
+OUTFILE="${OUTFILE:-$DIR/poolparty.out}"
 
 NORM=${NORM:-yes}
 STATUS=${NORM:-yes}
-COMP=${NORM:-yes}
+COMPILATION=${COMPILATION:-yes}
 HARD=${HARD:-no}
+FORBIDDEN=${FORBIDDEN:-yes}
 
 if [ -t 1 ]; then
 	is_subshell() {
@@ -76,7 +77,7 @@ fmt_code() {
 }
 
 fmt_error() {
-	printf '\r\033[K┃%s>Error: %s%s\n' "${FMT_BOLD}${FMT_RED}" "$*" "$FMT_RESET" >&2
+	printf '\r\033[K┃%s> Error: %s%s\n' "${FMT_BOLD}${FMT_RED}" "$*" "$FMT_RESET" >&2
 }
 
 
@@ -136,9 +137,10 @@ print_help() {
 ┃> --version, -v : Affiche la version.
 ┃> --update, -p  : Update PoolParty.
 ┃
-┃> --skip-norm, -n   : Ne vérifie pas la norme.
-┃> --skip-status, -g : Ne vérifie pas le status git.
-┃> --skip-comp, -c   : Ne vérifie pas la compilation.
+┃> --skip-norm, -n          : Ne vérifie pas la norme.
+┃> --skip-status, -g        : Ne vérifie pas le status git.
+┃> --skip-compilation, -c   : Ne vérifie pas la compilation.
+┃> --skip-forbidden, -f     : Ne vérifie pas les fonctions interdite.
 ┃
 ┃> --hard-check, -hard : Compile avec scan-build-12.
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -159,15 +161,53 @@ parse_arg() {
 			--help|-h) print_help; exit 1 ;;
 			--skip-norm|-n) NORM=no ;;
 			--skip-status|-g) STATUS=no ;;
-			--skip-comp|-c) COMP=no ;;
+			--skip-compilation|-c) COMPILATION=no ;;
+			--skip-forbidden|-f) FORBIDDEN=no ;;
 			--hard-check|-hard) HARD=yes ;;
 		esac
 		shift
 	done
 }
 
-main()
-{
+check_norm() {
+	printf "┃ NORMINETTE\n"
+	if ! command_exists norminette; then
+		fmt_error "Norminette not installed"
+		return
+	fi
+	printf "┃ %s\n\n" "$(norminette -v)"
+	norminette -R . | if grep -qEi "Warning|Error"
+	then
+		norminette -R . | grep -Ei 'Warning|Error'; true
+		printf "\n┃${FMT_RED}- KO X${FMT_RESET}\n"
+	else
+		norminette -R .
+		printf "All files check."
+		printf "\n┃${FMT_GREEN}- OK √${FMT_RESET}\n"
+	fi
+}
+
+check_status() {
+	printf "┃ GIT STATUS\n"
+	if ! command_exists git; then
+		fmt_error "Git it is not installed"
+		return
+	fi
+
+	if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+		fmt_error "No Respository here"
+	else
+		if git diff-index --name-status --exit-code HEAD > /dev/null 2>&1; then
+			printf "┃> Repository is update\n";
+			printf "\n┃${FMT_GREEN}- OK √${FMT_REST}\n"
+		else
+			printf "\n┃> Repository is not update";
+			printf "\n┃${FMT_RED}- KO X${FMT_RESET}\n"
+		fi
+	fi
+}
+
+main() {
 
 	setup_color
 
@@ -175,13 +215,16 @@ main()
 	diff_version
 
 	if [ "$NORM" = yes ]; then
-		echo "norm"
+		check_norm
 	fi
 	if [ "$STATUS" = yes ]; then
-		echo "status"
+		check_status
 	fi
-	if [ "$COMP" = yes ]; then
+	if [ "$COMPILATION" = yes ]; then
 		echo "comp"
+	fi
+	if [ "$FORBIDDEN" = yes ]; then
+		echo "forbidden"
 	fi
 }
 
