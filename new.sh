@@ -4,13 +4,13 @@
 set -e
 
 AUTHOR="Theo ZERIBI - thzeribi";
-VERSION="4.0.0";
+PPDIR="${PPDIR:-$HOME/.poolparty}"
+VERSION="${VERSION:-$(cat $PPDIR/.version)}"
 
 REPO=${REPO:-TheoZerbibi/PoolParty}
 REMOTE=${REMOTE:-https://github.com/${REPO}.git}
 REMOTE_V="${REMOTE_V:-$(curl -s "https://raw.githubusercontent.com/${REPO}/master/.version")}"
 
-PPDIR="${DIR:-$HOME/.poolparty}"
 
 USER=${USER:-$(id -u -n)}
 BASEDIR="${BASEDIR:-$(dirname "$0")}";
@@ -226,6 +226,7 @@ main() {
 	if [ "$FORBIDDEN" = yes ]; then
 		echo "forbidden"
 	fi
+	echo $VERSION
 }
 
 main "$@"
