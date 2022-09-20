@@ -126,6 +126,7 @@ EOF
 }
 
 update_pp() {
+	clear
 	rm -rf $PPDIR
 	sh -c "$(curl -fsSL https://raw.githubusercontent.com/TheoZerbibi/PoolParty/master/install.sh)"
 }
@@ -226,7 +227,6 @@ main() {
 	if [ "$FORBIDDEN" = yes ]; then
 		echo "forbidden"
 	fi
-	echo $VERSION
 }
 
 main "$@"
